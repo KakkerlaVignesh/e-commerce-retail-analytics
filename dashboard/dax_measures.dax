@@ -1,0 +1,80 @@
+// ============================================================================
+// POWER BI DAX MEASURES FILE (AUTHENTIC KAGGLE OLIST DATASET)
+// Currency Format: Brazilian Real (R$)
+// ============================================================================
+
+// 1. Total Revenue (R$)
+Total Revenue = 
+SUMX(
+    FILTER('clean_orders', 'clean_orders'[order_status] = "delivered"),
+    RELATED('clean_order_items'[price]) + RELATED('clean_order_items'[freight_value])
+)
+
+// 2. Total Delivered Orders
+Total Orders = 
+CALCULATE(
+    DISTINCTCOUNT('clean_orders'[order_id]),
+    'clean_orders'[order_status] = "delivered"
+)
+
+// 3. Average Order Value (AOV in R$)
+Average Order Value = 
+DIVIDE([Total Revenue], [Total Orders], 0)
+
+// 4. Total Freight Cost (R$)
+Total Freight Cost = 
+SUMX(
+    FILTER('clean_orders', 'clean_orders'[order_status] = "delivered"),
+    RELATED('clean_order_items'[freight_value])
+)
+
+// 5. On-Time Delivery Rate (%)
+On-Time Delivery Rate % = 
+VAR TotalDelivered = CALCULATE(COUNTROWS('clean_orders'), 'clean_orders'[order_status] = "delivered" && NOT(ISBLANK('clean_orders'[order_delivered_customer_date])))
+VAR OnTimeCount = CALCULATE(
+    COUNTROWS('clean_orders'), 
+    'clean_orders'[order_status] = "delivered" && 
+    'clean_orders'[order_delivered_customer_date] <= 'clean_orders'[order_estimated_delivery_date]
+)
+RETURN
+DIVIDE(OnTimeCount, TotalDelivered, 0) * 100
+
+// 6. Delayed Orders Count
+Delayed Orders = 
+CALCULATE(
+    COUNTROWS('clean_orders'),
+    'clean_orders'[order_status] = "delivered" &&
+    'clean_orders'[order_delivered_customer_date] > 'clean_orders'[order_estimated_delivery_date]
+)
+
+// 7. Delay Rate %
+Delay Rate % = 
+100 - [On-Time Delivery Rate %]
+
+// 8. Month-over-Month Revenue Growth %
+MoM Revenue Growth % = 
+VAR CurrentMonthRev = [Total Revenue]
+VAR PrevMonthRev = CALCULATE([Total Revenue], DATEADD('DimDate'[Date], -1, MONTH))
+RETURN
+IF(
+    ISBLANK(PrevMonthRev),
+    BLANK(),
+    DIVIDE(CurrentMonthRev - PrevMonthRev, PrevMonthRev, 0) * 100
+)
+
+// 9. Repeat Customer Rate (%)
+Repeat Customer Rate % = 
+VAR TotalCust = DISTINCTCOUNT('clean_customers'[customer_unique_id])
+VAR RepeatCust = 
+    COUNTROWS(
+        FILTER(
+            SUMMARIZE('clean_customers', 'clean_customers'[customer_unique_id], "OrderCnt", DISTINCTCOUNT('clean_orders'[order_id])),
+            [OrderCnt] > 1
+        )
+    )
+RETURN
+DIVIDE(RepeatCust, TotalCust, 0) * 100
+
+// 10. Average Customer Review Score
+Avg Review Score = 
+AVERAGE('clean_order_reviews'[review_score])
