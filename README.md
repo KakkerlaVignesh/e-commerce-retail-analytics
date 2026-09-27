@@ -327,9 +327,4 @@ Read the 1-page business report in [`executive_summary.md`](executive_summary.md
 
 ---
 
-## 7. 📝 Resume Bullet Points & Description
-
-Copy and paste snippets from [`resume_bullets.md`](resume_bullets.md) directly into your resume:
-
-> **Authentic E-Commerce Retail Analytics & Customer Satisfaction Dashboard** | *SQL, Python, Power BI*  
 > End-to-end retail analytics project evaluating R$ 15.42M in gross merchandise revenue across 96,478 delivered orders from the authentic Kaggle Olist dataset. Engineered an automated Python/SQLite data pipeline to clean 112,000+ transactional records, deduplicate item entries, and handle missing attributes. Wrote advanced SQL queries utilizing CTEs and Window Functions (`LAG`, `DENSE_RANK`, `SUM OVER`) to analyze monthly revenue trends, customer repeat purchase rate (3.0%), average order value (R$ 159.85), and regional logistics bottlenecks. Built an interactive 2-page Power BI executive dashboard with DAX measures, revealing that delivery delays cause a 1.72-point drop in customer review ratings and surge 1-star reviews from 6.6% to 46.2%.
